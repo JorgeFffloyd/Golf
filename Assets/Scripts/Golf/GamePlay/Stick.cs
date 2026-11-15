@@ -5,6 +5,8 @@ namespace Golf.GamePlay
 {
     public class Stick : MonoBehaviour
     {
+        [SerializeField] private AudioSource m_hitAudioSource;
+
         private Quaternion m_pointA;
         private Quaternion m_pointB;
 
@@ -33,6 +35,15 @@ namespace Golf.GamePlay
         private void StopSwing()
         {
             m_isSwinging = false;
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+
+            if (m_hitAudioSource != null)
+            {
+                m_hitAudioSource.Play();
+            }
         }
 
         private void FixedUpdate()

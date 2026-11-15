@@ -1,3 +1,5 @@
+
+using UnityEngine;
 using Golf.GamePlay;
 using Golf.Golf.GamePlay;
 using Golf.Golf.Source;
@@ -11,34 +13,55 @@ namespace Golf.Golf.States
         private readonly StoneSpawner m_spawner;
         private readonly Stick m_stick;
         private readonly ScoreService m_score;
+        private readonly BalanceService m_balance;
+        private readonly Basket m_basket;
         private readonly HudView m_hud;
         private readonly HitButton m_hitButton;
+        private readonly AudioSource m_music;
 
         public GamePlayState(
             StoneSpawner spawner,
             Stick stick,
             ScoreService score,
+            BalanceService balance,
+            Basket basket,
             HudView hud,
-            HitButton hitButton)
+            HitButton hitButton,
+            AudioSource music)
         {
             m_spawner = spawner;
             m_stick = stick;
             m_score = score;
+            m_balance = balance;
+            m_basket = basket;
             m_hud = hud;
             m_hitButton = hitButton;
+            m_music = music;
         }
 
         public void Enter()
         {
             m_score.Reset();
+            m_basket.ResetBasket();
+
+            m_balance.OnBalanceChanged += m_hud.SetBalance;
 
             m_hud.Show();
             m_hud.SetScore(m_score.CurrentScore);
+            m_hud.SetBalance(m_balance.CurrentBalance);
 
             m_hitButton.Show();
             m_hitButton.OnHit += HandleHit;
 
+            m_basket.OnGoldOreCollected += HandleGoldOreCollected;
+
+            m_spawner.ResetSpawner();
             m_spawner.StartSpawning();
+
+            if (m_music != null && !m_music.isPlaying)
+            {
+                m_music.Play();
+            }
         }
 
         public void Exit()
@@ -47,8 +70,16 @@ namespace Golf.Golf.States
 
             m_hitButton.OnHit -= HandleHit;
 
+            m_basket.OnGoldOreCollected -= HandleGoldOreCollected;
+            m_balance.OnBalanceChanged -= m_hud.SetBalance;
+
             m_hitButton.Hide();
             m_hud.Hide();
+
+            if (m_music != null)
+            {
+                m_music.Stop();
+            }
         }
 
         public void Update(float deltaTime)
@@ -58,6 +89,11 @@ namespace Golf.Golf.States
         private void HandleHit()
         {
             m_stick.StartSwing();
+        }
+
+        private void HandleGoldOreCollected()
+        {
+            m_balance.Add(1);
         }
     }
 }

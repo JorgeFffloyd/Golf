@@ -5,6 +5,8 @@ namespace Golf.Golf.GamePlay
 {
     public class Stone : MonoBehaviour
     {
+        [SerializeField] private AudioSource m_hitAudioSource;
+
         public event Action<Stone> OnStoneCollision;
 
         private bool m_isHit;
@@ -28,8 +30,13 @@ namespace Golf.Golf.GamePlay
 
         private void OnCollisionEnter(Collision collision)
         {
-            OnStoneCollision?.Invoke(this);
+
+            if (m_hitAudioSource != null)
+            {
+                m_hitAudioSource.Play();
+            }
         }
+
 
         public void SetPhysicsEnabled(bool enabled)
         {

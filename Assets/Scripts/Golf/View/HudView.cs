@@ -8,6 +8,7 @@ namespace Golf.Golf.View
     {
         [SerializeField] private GameObject m_hud;
         [SerializeField] private TMP_Text m_scoreText;
+        [SerializeField] private TMP_Text m_balanceText;
 
         public void Show()
         {
@@ -24,6 +25,14 @@ namespace Golf.Golf.View
             if (m_scoreText != null)
             {
                 m_scoreText.text = "SCORE: " + score;
+            }
+        }
+
+        public void SetBalance(int balance)
+        {
+            if (m_balanceText != null)
+            {
+                m_balanceText.text = "BALANCE: " + balance;
             }
         }
     }

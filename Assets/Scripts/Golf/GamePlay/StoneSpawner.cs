@@ -1,5 +1,6 @@
 
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Golf.GamePlay
@@ -8,6 +9,10 @@ namespace Golf.GamePlay
     {
         [SerializeField] private float m_currentMaxTime = 3f;
         [SerializeField] private float m_timeDecrease = 0.2f;
+        [SerializeField] private GameObject m_alternativePrefab;
+
+        [Range(0f, 1f)]
+        [SerializeField] private float m_alternativeChance = 0.2f;
 
         private float m_initialMaxTime;
         private GameObject m_stonePrefab;
@@ -15,17 +20,19 @@ namespace Golf.GamePlay
         private Coroutine m_spawnCoroutine;
         private bool m_isRunning;
 
+        private readonly List<GameObject> m_spawnedObjects =
+            new List<GameObject>();
+
         private void Awake()
         {
             m_initialMaxTime = m_currentMaxTime;
-
             m_stonePrefab = Resources.Load<GameObject>("falling_stone");
-
         }
 
         public void ResetSpawner()
         {
             StopSpawning();
+            ClearSpawnedObjects();
             m_currentMaxTime = m_initialMaxTime;
         }
 
@@ -49,6 +56,17 @@ namespace Golf.GamePlay
             }
         }
 
+        private void ClearSpawnedObjects()
+        {
+            foreach (GameObject spawnedObject in m_spawnedObjects)
+            {
+                if (spawnedObject != null)
+                    Destroy(spawnedObject);
+            }
+
+            m_spawnedObjects.Clear();
+        }
+
         private IEnumerator SpawnRoutine()
         {
             while (m_isRunning)
@@ -60,13 +78,26 @@ namespace Golf.GamePlay
                 if (!m_isRunning)
                     yield break;
 
-                GameObject stone = Instantiate(
-                    m_stonePrefab,
+                GameObject prefabToSpawn = m_stonePrefab;
+
+                if (m_alternativePrefab != null &&
+                    Random.value < m_alternativeChance)
+                {
+                    prefabToSpawn = m_alternativePrefab;
+                }
+
+                GameObject spawnedObject = Instantiate(
+                    prefabToSpawn,
                     transform.position + new Vector3(0f, 3f, 0f),
                     Quaternion.identity
                 );
 
-                stone.transform.localScale *= 0.3f;
+                m_spawnedObjects.Add(spawnedObject);
+
+                if (prefabToSpawn == m_stonePrefab)
+                {
+                    spawnedObject.transform.localScale *= 0.3f;
+                }
 
                 m_currentMaxTime = Mathf.Max(
                     0.5f,
@@ -80,6 +111,7 @@ namespace Golf.GamePlay
         private void OnDisable()
         {
             StopSpawning();
+            ClearSpawnedObjects();
         }
     }
 }
