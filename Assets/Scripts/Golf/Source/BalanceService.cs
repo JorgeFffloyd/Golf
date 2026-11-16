@@ -22,7 +22,22 @@ namespace Golf.Golf.Source
                 return;
 
             CurrentBalance += amount;
+            SaveBalance();
+        }
 
+        public bool Spend(int amount)
+        {
+            if (amount <= 0 || CurrentBalance < amount)
+                return false;
+
+            CurrentBalance -= amount;
+            SaveBalance();
+
+            return true;
+        }
+
+        private void SaveBalance()
+        {
             PlayerPrefs.SetInt(BalanceKey, CurrentBalance);
             PlayerPrefs.Save();
 

@@ -1,4 +1,3 @@
-
 using TMPro;
 using UnityEngine;
 
@@ -24,7 +23,7 @@ namespace Golf.Golf.View
         {
             if (m_scoreText != null)
             {
-                m_scoreText.text = "SCORE: " + score;
+                m_scoreText.text = "Score: " + score;
             }
         }
 
@@ -32,7 +31,7 @@ namespace Golf.Golf.View
         {
             if (m_balanceText != null)
             {
-                m_balanceText.text = "BALANCE: " + balance;
+                m_balanceText.text = "Gold: " + balance;
             }
         }
     }

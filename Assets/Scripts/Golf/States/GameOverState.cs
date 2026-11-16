@@ -26,6 +26,8 @@ namespace Golf.Golf.States
         {
             m_score.SaveRecord();
 
+            m_view.SetHighScore(m_score.HighScore);
+
             m_view.Show();
             m_view.SetMenuAction(m_returnToMenu);
         }

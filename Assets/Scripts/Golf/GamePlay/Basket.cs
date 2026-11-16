@@ -1,4 +1,3 @@
-
 using System;
 using UnityEngine;
 
@@ -34,7 +33,9 @@ namespace Golf.Golf.GamePlay
 
             if (goldOre != null && goldOre.TryCollect())
             {
+
                 OnGoldOreCollected?.Invoke();
+
                 Destroy(goldOre.gameObject);
             }
         }

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using System;
 
 namespace Golf.Golf.View
@@ -8,6 +9,7 @@ namespace Golf.Golf.View
     {
         [SerializeField] private GameObject m_gameOver;
         [SerializeField] private Button m_menuButton;
+        [SerializeField] private TMP_Text m_highScoreText;
 
         public void Show()
         {
@@ -17,6 +19,14 @@ namespace Golf.Golf.View
         public void Hide()
         {
             m_gameOver.SetActive(false);
+        }
+
+        public void SetHighScore(int score)
+        {
+            if (m_highScoreText != null)
+            {
+                m_highScoreText.text = "Best score: " + score;
+            }
         }
 
         public void SetMenuAction(Action action)

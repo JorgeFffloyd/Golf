@@ -19,6 +19,8 @@ namespace Golf.Golf.States
         private readonly HitButton m_hitButton;
         private readonly AudioSource m_music;
 
+        private StickCollision[] m_stickCollisions;
+
         public GamePlayState(
             StoneSpawner spawner,
             Stick stick,
@@ -55,6 +57,14 @@ namespace Golf.Golf.States
 
             m_basket.OnGoldOreCollected += HandleGoldOreCollected;
 
+            m_stickCollisions =
+                m_stick.GetComponentsInChildren<StickCollision>(true);
+
+            foreach (StickCollision collision in m_stickCollisions)
+            {
+                collision.OnStoneHit += HandleStoneHit;
+            }
+
             m_spawner.ResetSpawner();
             m_spawner.StartSpawning();
 
@@ -72,6 +82,15 @@ namespace Golf.Golf.States
 
             m_basket.OnGoldOreCollected -= HandleGoldOreCollected;
             m_balance.OnBalanceChanged -= m_hud.SetBalance;
+
+            if (m_stickCollisions != null)
+            {
+                foreach (StickCollision collision in m_stickCollisions)
+                {
+                    if (collision != null)
+                        collision.OnStoneHit -= HandleStoneHit;
+                }
+            }
 
             m_hitButton.Hide();
             m_hud.Hide();
@@ -91,9 +110,16 @@ namespace Golf.Golf.States
             m_stick.StartSwing();
         }
 
+        private void HandleStoneHit()
+        {
+            m_score.AddPoint();
+            m_hud.SetScore(m_score.CurrentScore);
+        }
+
         private void HandleGoldOreCollected()
         {
             m_balance.Add(1);
+            m_hud.SetBalance(m_balance.CurrentBalance);
         }
     }
 }

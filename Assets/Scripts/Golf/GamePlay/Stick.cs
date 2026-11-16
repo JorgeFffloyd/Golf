@@ -1,11 +1,28 @@
-
 using UnityEngine;
+using Golf.Golf.GamePlay;
 
 namespace Golf.GamePlay
 {
     public class Stick : MonoBehaviour
     {
+        public bool IsSwinging => m_isSwinging;
+
+        private const string SelectedModelKey = "SelectedStickModel";
+
+        [Header("Stick Position")]
+        [SerializeField] private Transform m_stickPoint;
+
+        [Header("Stick Models")]
+        [SerializeField] private GameObject m_defaultModel;
+        [SerializeField] private GameObject m_pickaxeModel;
+        [SerializeField] private GameObject m_hammerModel;
+
+        [Header("Audio")]
         [SerializeField] private AudioSource m_hitAudioSource;
+
+        [Header("Hit Settings")]
+        [SerializeField] private float m_hitForce = 8f;
+        [SerializeField] private float m_upwardForce = 2f;
 
         private Quaternion m_pointA;
         private Quaternion m_pointB;
@@ -15,10 +32,80 @@ namespace Golf.GamePlay
 
         private void Awake()
         {
-            m_pointA = transform.localRotation;
+            m_rb = GetComponent<Rigidbody>();
+
+            if (m_stickPoint != null)
+            {
+                transform.SetPositionAndRotation(
+                    m_stickPoint.position,
+                    m_stickPoint.rotation
+                );
+
+                if (m_rb != null)
+                {
+                    m_rb.position = m_stickPoint.position;
+                    m_rb.rotation = m_stickPoint.rotation;
+                }
+            }
+            else
+            {
+                Debug.LogWarning(
+                    "Stick: StickPoint is not assigned!"
+                );
+            }
+
+            m_pointA = transform.rotation;
             m_pointB = m_pointA * Quaternion.Euler(100f, 0f, 0f);
 
-            m_rb = GetComponent<Rigidbody>();
+            LoadSelectedModel();
+        }
+
+        private void LoadSelectedModel()
+        {
+            int selectedModel = PlayerPrefs.GetInt(
+                SelectedModelKey, 0
+            );
+
+            if (selectedModel == 1)
+                SelectPickaxeModel();
+            else if (selectedModel == 2)
+                SelectHammerModel();
+            else
+                SelectDefaultModel();
+        }
+
+        public void SelectDefaultModel()
+        {
+            SetModel(m_defaultModel);
+        }
+
+        public void SelectPickaxeModel()
+        {
+            SetModel(m_pickaxeModel);
+        }
+
+        public void SelectHammerModel()
+        {
+            SetModel(m_hammerModel);
+        }
+
+        private void SetModel(GameObject selectedModel)
+        {
+
+            if (m_defaultModel != null)
+                m_defaultModel.SetActive(
+                    selectedModel == m_defaultModel
+                );
+
+            if (m_pickaxeModel != null)
+                m_pickaxeModel.SetActive(
+                    selectedModel == m_pickaxeModel
+                );
+
+            if (m_hammerModel != null)
+                m_hammerModel.SetActive(
+                    selectedModel == m_hammerModel
+                );
         }
 
         public void StartSwing()
@@ -39,6 +126,22 @@ namespace Golf.GamePlay
 
         private void OnCollisionEnter(Collision collision)
         {
+            if (!m_isSwinging)
+                return;
+
+            Stone stone = collision.gameObject.GetComponentInParent<Stone>();
+
+            if (stone != null)
+            {
+                Vector3 direction =
+                    (stone.transform.position - transform.position).normalized;
+
+                Vector3 force =
+                    direction * m_hitForce +
+                    Vector3.up * m_upwardForce;
+
+                stone.Hit(force);
+            }
 
             if (m_hitAudioSource != null)
             {

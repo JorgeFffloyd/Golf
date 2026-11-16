@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace Golf.Golf.GamePlay
@@ -7,7 +6,7 @@ namespace Golf.Golf.GamePlay
     {
         [SerializeField] private AudioSource m_hitAudioSource;
 
-        public event Action<Stone> OnStoneCollision;
+        public event System.Action<Stone> OnStoneCollision;
 
         private bool m_isHit;
         private Rigidbody m_rb;
@@ -25,11 +24,11 @@ namespace Golf.Golf.GamePlay
                 return;
 
             m_isHit = true;
-            m_rb.AddForce(force, ForceMode.Impulse);
-        }
 
-        private void OnCollisionEnter(Collision collision)
-        {
+            m_rb.isKinematic = false;
+            m_rb.AddForce(force, ForceMode.Impulse);
+
+            OnStoneCollision?.Invoke(this);
 
             if (m_hitAudioSource != null)
             {
@@ -37,11 +36,20 @@ namespace Golf.Golf.GamePlay
             }
         }
 
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (m_hitAudioSource != null)
+            {
+                m_hitAudioSource.Play();
+            }
+        }
 
         public void SetPhysicsEnabled(bool enabled)
         {
             if (m_rb != null)
+            {
                 m_rb.isKinematic = !enabled;
+            }
         }
     }
 }

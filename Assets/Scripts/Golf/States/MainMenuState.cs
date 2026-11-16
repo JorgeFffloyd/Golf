@@ -10,21 +10,26 @@ namespace Golf.Golf.States
         private readonly MainMenuView m_view;
         private readonly ScoreService m_score;
         private readonly Action m_startGame;
+        private readonly Action m_openShop;
 
         public MainMenuState(
             MainMenuView view,
             ScoreService score,
-            Action startGame)
+            Action startGame,
+            Action openShop)
         {
             m_view = view;
             m_score = score;
             m_startGame = startGame;
+            m_openShop = openShop;
         }
 
         public void Enter()
         {
             m_view.Show();
+
             m_view.SetPlayAction(m_startGame);
+            m_view.SetShopAction(m_openShop);
         }
 
         public void Exit()

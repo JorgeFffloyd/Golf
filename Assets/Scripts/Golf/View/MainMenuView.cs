@@ -1,4 +1,3 @@
-
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,6 +8,7 @@ namespace Golf.Golf.View
     {
         [SerializeField] private GameObject m_mainMenu;
         [SerializeField] private Button m_playButton;
+        [SerializeField] private Button m_shopButton;
 
         public void Show()
         {
@@ -23,7 +23,17 @@ namespace Golf.Golf.View
         public void SetPlayAction(Action action)
         {
             m_playButton.onClick.RemoveAllListeners();
-            m_playButton.onClick.AddListener(() => action?.Invoke());
+            m_playButton.onClick.AddListener(
+                () => action?.Invoke()
+            );
+        }
+
+        public void SetShopAction(Action action)
+        {
+            m_shopButton.onClick.RemoveAllListeners();
+            m_shopButton.onClick.AddListener(
+                () => action?.Invoke()
+            );
         }
     }
 }
