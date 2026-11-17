@@ -12114,7 +12114,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 12
   m_Type: 1
-  m_Color: {r: 0.97794116, g: 0.96583366, b: 0.8269355, a: 1}
+  m_Color: {r: 0.9098039, g: 0.9764706, b: 0.96114594, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
@@ -12124,10 +12124,10 @@ Light:
     m_Type: 2
     m_Resolution: 3
     m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0
-    m_NearPlane: 0.2
+    m_Strength: 0.279
+    m_Bias: 0.121
+    m_NormalBias: 3
+    m_NearPlane: 0.62
     m_CullingMatrixOverride:
       e00: 1
       e01: 0
@@ -12178,7 +12178,7 @@ Transform:
   m_GameObject: {fileID: 867313192}
   serializedVersion: 2
   m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalPosition: {x: 152.9, y: 26.97, z: -22.05}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -21466,6 +21466,7 @@ Transform:
   - {fileID: 380255991}
   - {fileID: 703257124}
   - {fileID: 1510949945}
+  - {fileID: 1576773629}
   - {fileID: 438750760}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -22680,7 +22681,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4278239485
   m_fontColor: {r: 0.990566, g: 0.75235206, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -24770,7 +24771,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Golf.GamePlay.StickCollision
   m_hitAudioSource: {fileID: 0}
-  m_hitForce: 8
+  m_hitForce: 30
   m_upwardForce: 2
 --- !u!54 &1510949948
 Rigidbody:
@@ -25988,6 +25989,11 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.44620135, y: 1.4101644, z: 0.18655112}
   m_Center: {x: 0.070282534, y: 0.418115, z: 0.012624312}
+--- !u!4 &1576773629 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2728306578926858670, guid: 58cd754c3dde1f944a2d86bd93a982bb, type: 3}
+  m_PrefabInstance: {fileID: 1699743418}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1583636242 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4227529355371724, guid: 5c474a6ba92e1694c88c1b7a86df7682, type: 3}
@@ -27422,7 +27428,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 0}
+    m_TransformParent: {fileID: 1264584465}
     m_Modifications:
     - target: {fileID: 2728306578926858670, guid: 58cd754c3dde1f944a2d86bd93a982bb, type: 3}
       propertyPath: m_RootOrder
@@ -27442,11 +27448,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2728306578926858670, guid: 58cd754c3dde1f944a2d86bd93a982bb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 81.25055
+      value: -538.1253
       objectReference: {fileID: 0}
     - target: {fileID: 2728306578926858670, guid: 58cd754c3dde1f944a2d86bd93a982bb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 23.082397
+      value: -255.70004
       objectReference: {fileID: 0}
     - target: {fileID: 2728306578926858670, guid: 58cd754c3dde1f944a2d86bd93a982bb, type: 3}
       propertyPath: m_LocalPosition.z
@@ -32992,7 +32998,6 @@ SceneRoots:
   - {fileID: 776657879}
   - {fileID: 462531607}
   - {fileID: 1737853769}
-  - {fileID: 1699743418}
   - {fileID: 1342711998}
   - {fileID: 1519538741}
   - {fileID: 226128562}
