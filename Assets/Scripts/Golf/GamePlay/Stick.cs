@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using Golf.Golf.GamePlay;
 
@@ -35,29 +36,38 @@ namespace Golf.GamePlay
             m_rb = GetComponent<Rigidbody>();
 
             if (m_stickPoint != null)
-            {
-                transform.SetPositionAndRotation(
-                    m_stickPoint.position,
-                    m_stickPoint.rotation
-                );
-
-                if (m_rb != null)
-                {
-                    m_rb.position = m_stickPoint.position;
-                    m_rb.rotation = m_stickPoint.rotation;
-                }
-            }
+                MoveToPoint(m_stickPoint);
             else
-            {
-                Debug.LogWarning(
-                    "Stick: StickPoint is not assigned!"
-                );
-            }
-
-            m_pointA = transform.rotation;
-            m_pointB = m_pointA * Quaternion.Euler(100f, 0f, 0f);
+                Debug.LogWarning("Stick: StickPoint is not assigned!");
 
             LoadSelectedModel();
+        }
+
+        public void MoveToPoint(Transform point)
+        {
+            if (point == null)
+                return;
+
+            CancelInvoke(nameof(StopSwing));
+            m_isSwinging = false;
+
+            transform.SetPositionAndRotation(
+                point.position,
+                point.rotation
+            );
+
+            if (m_rb != null)
+            {
+                m_rb.position = point.position;
+                m_rb.rotation = point.rotation;
+                m_rb.linearVelocity = Vector3.zero;
+                m_rb.angularVelocity = Vector3.zero;
+            }
+
+            m_pointA = point.rotation;
+            m_pointB = m_pointA * Quaternion.Euler(100f, 0f, 0f);
+
+            m_stickPoint = point;
         }
 
         private void LoadSelectedModel()
@@ -91,7 +101,6 @@ namespace Golf.GamePlay
 
         private void SetModel(GameObject selectedModel)
         {
-
             if (m_defaultModel != null)
                 m_defaultModel.SetActive(
                     selectedModel == m_defaultModel
@@ -144,9 +153,7 @@ namespace Golf.GamePlay
             }
 
             if (m_hitAudioSource != null)
-            {
                 m_hitAudioSource.Play();
-            }
         }
 
         private void FixedUpdate()

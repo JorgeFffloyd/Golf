@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using Golf.GamePlay;
 using Golf.Golf.GamePlay;
@@ -10,39 +9,57 @@ namespace Golf.Golf.States
 {
     public class GamePlayState : IGameState, IUpdatable
     {
-        private readonly StoneSpawner m_spawner;
+        private GameplayArea m_area;
+
         private readonly Stick m_stick;
         private readonly ScoreService m_score;
         private readonly BalanceService m_balance;
-        private readonly Basket m_basket;
         private readonly HudView m_hud;
         private readonly HitButton m_hitButton;
-        private readonly AudioSource m_music;
+
+        private StoneSpawner m_spawner;
+        private Basket m_basket;
+        private AudioSource m_music;
 
         private StickCollision[] m_stickCollisions;
 
         public GamePlayState(
-            StoneSpawner spawner,
+            GameplayArea area,
             Stick stick,
             ScoreService score,
             BalanceService balance,
-            Basket basket,
             HudView hud,
-            HitButton hitButton,
-            AudioSource music)
+            HitButton hitButton)
         {
-            m_spawner = spawner;
+            m_area = area;
             m_stick = stick;
             m_score = score;
             m_balance = balance;
-            m_basket = basket;
             m_hud = hud;
             m_hitButton = hitButton;
-            m_music = music;
+        }
+
+        public void SetGameplayArea(GameplayArea area)
+        {
+            m_area = area;
         }
 
         public void Enter()
         {
+            if (m_area == null)
+            {
+                Debug.LogError(
+                    "GamePlayState: Игровая область не назначена!"
+                );
+                return;
+            }
+
+            m_spawner = m_area.Spawner;
+            m_basket = m_area.AreaBasket;
+            m_music = m_area.Music;
+
+            m_area.AreaCamera.enabled = true;
+
             m_score.Reset();
             m_basket.ResetBasket();
 
@@ -69,18 +86,19 @@ namespace Golf.Golf.States
             m_spawner.StartSpawning();
 
             if (m_music != null && !m_music.isPlaying)
-            {
                 m_music.Play();
-            }
         }
 
         public void Exit()
         {
-            m_spawner.StopSpawning();
+            if (m_spawner != null)
+                m_spawner.StopSpawning();
 
             m_hitButton.OnHit -= HandleHit;
 
-            m_basket.OnGoldOreCollected -= HandleGoldOreCollected;
+            if (m_basket != null)
+                m_basket.OnGoldOreCollected -= HandleGoldOreCollected;
+
             m_balance.OnBalanceChanged -= m_hud.SetBalance;
 
             if (m_stickCollisions != null)
@@ -96,9 +114,7 @@ namespace Golf.Golf.States
             m_hud.Hide();
 
             if (m_music != null)
-            {
                 m_music.Stop();
-            }
         }
 
         public void Update(float deltaTime)
