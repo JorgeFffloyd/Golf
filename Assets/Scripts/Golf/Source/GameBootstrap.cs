@@ -11,17 +11,17 @@ namespace Golf.Golf.Source
 {
     public class GameBootstrap : MonoBehaviour
     {
-        [Header("Gameplay Components")]
-        [SerializeField] private StoneSpawner m_spawner;
-        [SerializeField] private Stick m_stick;
-        [SerializeField] private Basket m_basket;
+        [Header("Gameplay Areas")]
+        [SerializeField] private GameplayArea m_firstArea;
+        [SerializeField] private GameplayArea m_secondArea;
 
-        [Header("Audio")]
-        [SerializeField] private AudioSource m_music;
+        [Header("Shared Stick")]
+        [SerializeField] private Stick m_stick;
+
+        [Header("Shop Audio")]
         [SerializeField] private AudioSource m_shopMusic;
 
-        [Header("Cameras")]
-        [SerializeField] private Camera m_mainCamera;
+        [Header("Shop Camera")]
         [SerializeField] private Camera m_shopCamera;
 
         [Header("UI")]
@@ -45,6 +45,15 @@ namespace Golf.Golf.Source
         [SerializeField] private Button m_hoeButton;
         [SerializeField] private TMP_Text m_hoeButtonText;
 
+        [Header("Map")]
+        [SerializeField] private Button m_secondMapButton;
+        [SerializeField] private TMP_Text m_secondMapButtonText;
+
+        private const string SelectedMapKey = "SelectedMap";
+        private const string SecondMapOwnedKey = "SecondMapOwned";
+
+        private GameplayArea m_activeArea;
+
         private IGameState m_currentState;
         private IUpdatable m_currentUpdatable;
 
@@ -58,11 +67,11 @@ namespace Golf.Golf.Source
 
         private void Start()
         {
-            if (m_spawner == null ||
+            if (m_firstArea == null ||
+                m_secondArea == null ||
+                !m_firstArea.IsConfigured() ||
+                !m_secondArea.IsConfigured() ||
                 m_stick == null ||
-                m_basket == null ||
-                m_music == null ||
-                m_mainCamera == null ||
                 m_shopCamera == null ||
                 m_menuView == null ||
                 m_hudView == null ||
@@ -76,7 +85,9 @@ namespace Golf.Golf.Source
                 m_pickaxeButtonText == null ||
                 m_hammerButtonText == null ||
                 m_hoeButton == null ||
-                m_hoeButtonText == null)
+                m_hoeButtonText == null ||
+                m_secondMapButton == null ||
+                m_secondMapButtonText == null)
             {
                 Debug.LogError(
                     "GameBootstrap: Не назначены необходимые ссылки!"
@@ -86,12 +97,26 @@ namespace Golf.Golf.Source
                 return;
             }
 
-            m_mainCamera.enabled = true;
             m_shopCamera.enabled = false;
             m_shopHud.SetActive(false);
 
             if (m_shopMusic != null)
                 m_shopMusic.Stop();
+
+            int selectedMap = PlayerPrefs.GetInt(SelectedMapKey, 0);
+
+            bool secondMapOwned = PlayerPrefs.GetInt(
+                SecondMapOwnedKey, 0
+            ) == 1;
+
+            if (selectedMap == 1 && !secondMapOwned)
+            {
+                selectedMap = 0;
+                PlayerPrefs.SetInt(SelectedMapKey, 0);
+                PlayerPrefs.Save();
+            }
+
+            SelectMap(selectedMap);
 
             HighScoreStorage storage = new HighScoreStorage();
 
@@ -106,14 +131,12 @@ namespace Golf.Golf.Source
             );
 
             m_playState = new GamePlayState(
-                m_spawner,
+                m_activeArea,
                 m_stick,
                 m_score,
                 m_balance,
-                m_basket,
                 m_hudView,
-                m_hitButton,
-                m_music
+                m_hitButton
             );
 
             m_gameOverState = new GameOverState(
@@ -123,7 +146,8 @@ namespace Golf.Golf.Source
             );
 
             m_shopState = new ShopState(
-                m_mainCamera,
+                m_firstArea,
+                m_secondArea,
                 m_shopCamera,
                 m_shopHud,
                 m_backToMenuButton,
@@ -134,13 +158,14 @@ namespace Golf.Golf.Source
                 m_hammerButtonText,
                 m_hoeButton,
                 m_hoeButtonText,
+                m_secondMapButton,
+                m_secondMapButtonText,
                 m_balance,
                 m_stick,
                 m_shopMusic,
-                ReturnToMenu
+                ReturnToMenu,
+                SelectMap
             );
-
-            m_basket.OnStoneHitBasket += EndGame;
 
             ChangeState(m_menuState);
         }
@@ -148,6 +173,41 @@ namespace Golf.Golf.Source
         private void Update()
         {
             m_currentUpdatable?.Update(Time.deltaTime);
+        }
+
+        private void SelectMap(int mapIndex)
+        {
+            GameplayArea newArea =
+                mapIndex == 1 ? m_secondArea : m_firstArea;
+
+            if (newArea == null)
+                return;
+
+            if (m_activeArea != null)
+                m_activeArea.AreaBasket.OnStoneHitBasket -= EndGame;
+
+            m_firstArea.SetAreaActive(newArea == m_firstArea);
+            m_secondArea.SetAreaActive(newArea == m_secondArea);
+
+            m_activeArea = newArea;
+
+            bool shopIsOpen = m_currentState is ShopState;
+
+            m_firstArea.AreaCamera.enabled =
+                !shopIsOpen && newArea == m_firstArea;
+
+            m_secondArea.AreaCamera.enabled =
+                !shopIsOpen && newArea == m_secondArea;
+
+            m_stick.MoveToPoint(m_activeArea.StickPoint);
+
+            m_activeArea.AreaBasket.OnStoneHitBasket += EndGame;
+
+            if (m_playState != null)
+                m_playState.SetGameplayArea(m_activeArea);
+
+            PlayerPrefs.SetInt(SelectedMapKey, mapIndex);
+            PlayerPrefs.Save();
         }
 
         private void ChangeState(IGameState newState)
@@ -186,8 +246,11 @@ namespace Golf.Golf.Source
 
         private void OnDestroy()
         {
-            if (m_basket != null)
-                m_basket.OnStoneHitBasket -= EndGame;
+            if (m_activeArea != null &&
+                m_activeArea.AreaBasket != null)
+            {
+                m_activeArea.AreaBasket.OnStoneHitBasket -= EndGame;
+            }
         }
     }
 }
