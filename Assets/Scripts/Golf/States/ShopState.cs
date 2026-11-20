@@ -269,14 +269,14 @@ namespace Golf.Golf.States
             );
 
             if (!pickaxeOwned)
-                m_pickaxeButtonText.text = "50 GOLD";
+                m_pickaxeButtonText.text = "5 GOLD";
             else if (selectedModel == 1)
                 m_pickaxeButtonText.text = "EQUIPPED";
             else
                 m_pickaxeButtonText.text = "EQUIP";
 
             if (!hammerOwned)
-                m_hammerButtonText.text = "100 GOLD";
+                m_hammerButtonText.text = "10 GOLD";
             else if (selectedModel == 2)
                 m_hammerButtonText.text = "EQUIPPED";
             else
@@ -294,7 +294,7 @@ namespace Golf.Golf.States
             );
 
             if (!secondMapOwned)
-                m_secondMapButtonText.text = SecondMapPrice + "1 GOLD";
+                m_secondMapButtonText.text = SecondMapPrice + "GOLD";
             else if (selectedMap == 1)
                 m_secondMapButtonText.text = "UNEQUIP";
             else
