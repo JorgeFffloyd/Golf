@@ -13,6 +13,7 @@ namespace Golf.GamePlay
         private Stick m_stick;
 
         public event Action OnStoneHit;
+        public event Action OnBombHit;
 
         private void Awake()
         {
@@ -24,6 +25,21 @@ namespace Golf.GamePlay
             if (m_stick == null || !m_stick.IsSwinging)
                 return;
 
+            Bomb bomb = collision.gameObject.GetComponentInParent<Bomb>();
+
+            if (bomb != null)
+            {
+                if (bomb.TryHit())
+                {
+                    OnBombHit?.Invoke();
+
+                    if (m_hitAudioSource != null)
+                        m_hitAudioSource.Play();
+                }
+
+                return;
+            }
+
             Stone stone = collision.gameObject.GetComponentInParent<Stone>();
 
             if (stone == null || stone.IsHit)
@@ -33,7 +49,8 @@ namespace Golf.GamePlay
                 (stone.transform.position - transform.position).normalized;
 
             Vector3 force =
-                direction * m_hitForce + Vector3.up * m_upwardForce;
+                direction * m_hitForce +
+                Vector3.up * m_upwardForce;
 
             stone.Hit(force);
 

@@ -30,6 +30,8 @@ namespace Golf.Golf.States
 
             m_view.SetPlayAction(m_startGame);
             m_view.SetShopAction(m_openShop);
+
+            m_view.SetHighScore(m_score.HighScore);
         }
 
         public void Exit()

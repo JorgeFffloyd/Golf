@@ -30,6 +30,9 @@ namespace Golf.Golf.Source
         [SerializeField] private HitButton m_hitButton;
         [SerializeField] private GameOverView m_gameOverView;
 
+        [Header("Pause")]
+        [SerializeField] private PauseView m_pauseView;
+
         [Header("Shop UI")]
         [SerializeField] private GameObject m_shopHud;
         [SerializeField] private Button m_backToMenuButton;
@@ -77,6 +80,7 @@ namespace Golf.Golf.Source
                 m_hudView == null ||
                 m_hitButton == null ||
                 m_gameOverView == null ||
+                m_pauseView == null ||
                 m_shopHud == null ||
                 m_backToMenuButton == null ||
                 m_shopBalanceText == null ||
@@ -96,6 +100,8 @@ namespace Golf.Golf.Source
                 enabled = false;
                 return;
             }
+
+            Time.timeScale = 1f;
 
             m_shopCamera.enabled = false;
             m_shopHud.SetActive(false);
@@ -136,8 +142,11 @@ namespace Golf.Golf.Source
                 m_score,
                 m_balance,
                 m_hudView,
-                m_hitButton
-            );
+                m_hitButton,
+                 m_pauseView,
+                ReturnToMenu,
+                EndGame
+                );
 
             m_gameOverState = new GameOverState(
                 m_score,
@@ -246,6 +255,8 @@ namespace Golf.Golf.Source
 
         private void OnDestroy()
         {
+            Time.timeScale = 1f;
+
             if (m_activeArea != null &&
                 m_activeArea.AreaBasket != null)
             {

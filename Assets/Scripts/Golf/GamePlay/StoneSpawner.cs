@@ -1,3 +1,4 @@
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,12 +7,21 @@ namespace Golf.GamePlay
 {
     public class StoneSpawner : MonoBehaviour
     {
+        [Header("Spawn Settings")]
         [SerializeField] private float m_currentMaxTime = 3f;
         [SerializeField] private float m_timeDecrease = 0.2f;
+
+        [Header("Alternative Prefab")]
         [SerializeField] private GameObject m_alternativePrefab;
 
         [Range(0f, 1f)]
         [SerializeField] private float m_alternativeChance = 0.2f;
+
+        [Header("Bomb")]
+        [SerializeField] private GameObject m_bombPrefab;
+
+        [Range(0f, 1f)]
+        [SerializeField] private float m_bombChance = 0.1f;
 
         private float m_initialMaxTime;
         private GameObject m_stonePrefab;
@@ -26,12 +36,20 @@ namespace Golf.GamePlay
         {
             m_initialMaxTime = m_currentMaxTime;
             m_stonePrefab = Resources.Load<GameObject>("falling_stone");
+
+            if (m_stonePrefab == null)
+            {
+                Debug.LogError(
+                    "StoneSpawner: Не найден falling_stone в Resources!"
+                );
+            }
         }
 
         public void ResetSpawner()
         {
             StopSpawning();
             ClearSpawnedObjects();
+
             m_currentMaxTime = m_initialMaxTime;
         }
 
@@ -66,6 +84,27 @@ namespace Golf.GamePlay
             m_spawnedObjects.Clear();
         }
 
+        private GameObject GetRandomPrefab()
+        {
+            float randomValue = Random.value;
+
+            float bombChance = m_bombPrefab != null
+                ? m_bombChance
+                : 0f;
+
+            float alternativeChance = m_alternativePrefab != null
+                ? m_alternativeChance
+                : 0f;
+
+            if (randomValue < bombChance)
+                return m_bombPrefab;
+
+            if (randomValue < bombChance + alternativeChance)
+                return m_alternativePrefab;
+
+            return m_stonePrefab;
+        }
+
         private IEnumerator SpawnRoutine()
         {
             while (m_isRunning)
@@ -77,13 +116,7 @@ namespace Golf.GamePlay
                 if (!m_isRunning)
                     yield break;
 
-                GameObject prefabToSpawn = m_stonePrefab;
-
-                if (m_alternativePrefab != null &&
-                    Random.value < m_alternativeChance)
-                {
-                    prefabToSpawn = m_alternativePrefab;
-                }
+                GameObject prefabToSpawn = GetRandomPrefab();
 
                 GameObject spawnedObject = Instantiate(
                     prefabToSpawn,

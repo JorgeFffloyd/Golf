@@ -7,6 +7,7 @@ namespace Golf.Golf.GamePlay
     {
         public event Action OnStoneHitBasket;
         public event Action OnGoldOreCollected;
+        public event Action OnBombCollected;
 
         private bool m_gameOverTriggered;
 
@@ -17,12 +18,20 @@ namespace Golf.Golf.GamePlay
 
         private void OnCollisionEnter(Collision collision)
         {
+            Bomb bomb = collision.collider.GetComponentInParent<Bomb>();
+
+            if (bomb != null)
+            {
+                OnBombCollected?.Invoke();
+                Destroy(bomb.gameObject);
+                return;
+            }
+
             Stone stone = collision.collider.GetComponentInParent<Stone>();
 
             if (stone != null)
             {
-                if (m_gameOverTriggered)
-                    return;
+                if (m_gameOverTriggered) return;
 
                 m_gameOverTriggered = true;
                 OnStoneHitBasket?.Invoke();
@@ -33,9 +42,7 @@ namespace Golf.Golf.GamePlay
 
             if (goldOre != null && goldOre.TryCollect())
             {
-
                 OnGoldOreCollected?.Invoke();
-
                 Destroy(goldOre.gameObject);
             }
         }
