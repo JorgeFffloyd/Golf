@@ -179,6 +179,10 @@ namespace Golf.Golf.Source
             ChangeState(m_menuState);
         }
 
+        private void Awake() 
+        {
+            Application.targetFrameRate = 120;
+        }
         private void Update()
         {
             m_currentUpdatable?.Update(Time.deltaTime);
