@@ -40,7 +40,7 @@ namespace Golf.GamePlay
             if (m_stonePrefab == null)
             {
                 Debug.LogError(
-                    "StoneSpawner: Не найден falling_stone в Resources!"
+                    "Не найден камен"
                 );
             }
         }

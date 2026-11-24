@@ -38,7 +38,7 @@ namespace Golf.GamePlay
             if (m_stickPoint != null)
                 MoveToPoint(m_stickPoint);
             else
-                Debug.LogWarning("Stick: StickPoint is not assigned!");
+                Debug.LogWarning("Ошибка мотыжная!");
 
             LoadSelectedModel();
         }
